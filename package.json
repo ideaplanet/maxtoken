@@ -1,5 +1,5 @@
 {
-  "name": "maxtoken-mcp",
+  "name": "maxtoken",
   "version": "1.0.0",
   "description": "Lightweight MCP server for GLM & Kimi Coding Plan balance query and utilization statistics.",
   "keywords": [
@@ -14,15 +14,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ideaplanet/maxtoken-mcp.git"
+    "url": "git+https://github.com/ideaplanet/maxtoken.git"
   },
-  "homepage": "https://github.com/ideaplanet/maxtoken-mcp#readme",
+  "homepage": "https://github.com/ideaplanet/maxtoken#readme",
   "bugs": {
-    "url": "https://github.com/ideaplanet/maxtoken-mcp/issues"
+    "url": "https://github.com/ideaplanet/maxtoken/issues"
   },
   "type": "module",
   "bin": {
-    "maxtoken-mcp": "./dist/index.js"
+    "maxtoken": "./dist/index.js"
   },
   "files": [
     "dist",

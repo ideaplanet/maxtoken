@@ -245,7 +245,7 @@ function computeWindowUtilization(win: WindowBalance) {
 
 // ==================== 5. MCP Server 注册与启动 ====================
 const server = new Server(
-  { name: "maxtoken-mcp", version: "1.0.0" },
+  { name: "maxtoken", version: "1.0.0" },
   { capabilities: { tools: {} } }
 );
 
@@ -354,6 +354,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("maxtoken-mcp 启动失败:", err);
+  console.error("maxtoken 启动失败:", err);
   process.exit(1);
 });

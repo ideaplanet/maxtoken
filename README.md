@@ -1,4 +1,4 @@
-# maxtoken-mcp
+# maxtoken
 
 Lightweight MCP server for [GLM Coding Plan](https://open.bigmodel.cn) & [Kimi Coding Plan](https://www.kimi.com) balance query and utilization statistics.
 
@@ -58,7 +58,7 @@ Add to your MCP client config (`.mcp.json` / `~/.claude.json`):
   "mcpServers": {
     "maxtoken": {
       "command": "npx",
-      "args": ["-y", "maxtoken-mcp", "--config", "/path/to/tokens.json"]
+      "args": ["-y", "maxtoken", "--config", "/path/to/tokens.json"]
     }
   }
 }
@@ -67,7 +67,7 @@ Add to your MCP client config (`.mcp.json` / `~/.claude.json`):
 Or run directly:
 
 ```bash
-npx maxtoken-mcp --config /path/to/tokens.json
+npx maxtoken --config /path/to/tokens.json
 ```
 
 The config path can also be set via the `MAXTOKEN_CONFIG` environment variable; it defaults to `./tokens.json`.
