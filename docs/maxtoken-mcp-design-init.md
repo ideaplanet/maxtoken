@@ -576,3 +576,14 @@ npm link
 }
 
 ```
+
+---
+
+## 五、变更补记：配置自动加载与 init 向导（2026-11-16）
+
+- 源码由单文件 `src/index.ts` 拆分为三模块：`src/config.ts`（配置解析链 / 加载校验）、`src/wizard.ts`（init 交互向导）、`src/index.ts`（CLI 分发 + MCP 服务器）。交互向导与 MCP 服务器为不相关关注点，拆分利于维护。
+- 默认配置路径由 `./tokens.json` 改为 `~/.maxtoken/tokens.json`（**breaking change**），解析链为 `--config` > `MAXTOKEN_CONFIG` > 默认路径；默认路径存在时自动加载，显式路径缺失直接报错。
+- 新增 `npx maxtoken init` 交互式向导（Node 内置 `readline/promises`，零新增运行时依赖）；目录权限 700、文件权限 600。
+- MCP 模式启动即预检配置，缺失时向 stderr 输出创建引导并 `exit(1)`（stdout 为 MCP 协议通道，不得污染）。
+
+详见 `docs/superpowers/specs/2026-11-16-config-autoload-design.md`。
