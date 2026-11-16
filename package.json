@@ -1,6 +1,6 @@
 {
   "name": "maxtoken",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Lightweight MCP server for GLM & Kimi Coding Plan balance query and utilization statistics.",
   "keywords": [
     "mcp",

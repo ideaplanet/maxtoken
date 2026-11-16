@@ -220,7 +220,7 @@ function computeWindowUtilization(win: WindowBalance) {
 
 // ==================== 5. MCP Server 注册与启动 ====================
 const server = new Server(
-  { name: "maxtoken", version: "1.0.0" },
+  { name: "maxtoken", version: "2.0.0" },
   { capabilities: { tools: {} } }
 );
 
