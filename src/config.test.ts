@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
-import { resolveConfig } from "./config.js";
+import { loadConfig, resolveConfig } from "./config.js";
 
 const existsIn =
   (paths: string[]) =>
@@ -69,4 +71,54 @@ test("resolveConfig: 相对路径被解析为绝对路径", () => {
     exists: existsIn([abs]),
   });
   assert.deepEqual(r, { status: "found", path: abs, source: "cli" });
+});
+
+// ==================== loadConfig 测试 ====================
+function tempConfig(content: string): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "maxtoken-test-"));
+  const file = path.join(dir, "tokens.json");
+  fs.writeFileSync(file, content, "utf-8");
+  return file;
+}
+
+test("loadConfig: 合法配置正常加载", () => {
+  const file = tempConfig(
+    JSON.stringify({
+      accounts: [
+        { id: "glm-main", provider: "glm", api_key: "k1" },
+        { id: "kimi-main", provider: "kimi", api_key: "k2" },
+      ],
+    })
+  );
+  const cfg = loadConfig(file);
+  assert.equal(cfg.accounts.length, 2);
+});
+
+test("loadConfig: 文件缺失时报含引导的错误", () => {
+  assert.throws(() => loadConfig("/definitely/not/here/tokens.json"), /未找到配置文件/);
+});
+
+test("loadConfig: 缺少 accounts 数组报错", () => {
+  assert.throws(() => loadConfig(tempConfig('{"foo": 1}')), /缺少 accounts 数组/);
+});
+
+test("loadConfig: JSON 语法错误报错", () => {
+  assert.throws(() => loadConfig(tempConfig("{not json")), /JSON 语法错误/);
+});
+
+test("loadConfig: 缺 id 与非法 provider 逐条报错", () => {
+  const file = tempConfig(
+    JSON.stringify({ accounts: [{ provider: "openai", api_key: "k1" }] })
+  );
+  assert.throws(
+    () => loadConfig(file),
+    (err: any) =>
+      err.message.includes("accounts[0]: 缺少 id") &&
+      err.message.includes("accounts[0]: provider 必须为 glm 或 kimi")
+  );
+});
+
+test("loadConfig: 缺 api_key 逐条报错", () => {
+  const file = tempConfig(JSON.stringify({ accounts: [{ id: "a", provider: "glm" }] }));
+  assert.throws(() => loadConfig(file), /accounts\[0\]: 缺少 api_key/);
 });
