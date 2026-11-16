@@ -32,6 +32,7 @@
 - 触发：`npx maxtoken init`（无额外参数时目标路径即解析链结果，默认 `~/.maxtoken/tokens.json`）
 - **目标文件已存在**：询问 覆盖重写 / 追加账号 / 中止
   - 追加前读取并校验现有文件；解析失败则拒绝追加、提示手动处理，避免损坏已有配置
+  - 追加模式下检测 `id` 冲突：新账号 id 与现有账号重复时要求重新输入（默认 id 建议自动避开已占用值，如 `glm-main-2`）
 - 问答流程（Node 内置 `readline/promises`，零新增依赖）：
   1. `provider`：glm / kimi（必选，输入校验）
   2. `id`：回车取默认 `{provider}-main`
@@ -46,9 +47,9 @@
 ## 三、CLI 分发与缺失引导（`src/index.ts`）
 
 - `process.argv[2] === "init"` → 运行向导后 `process.exit`；否则进入 MCP 服务器模式（现有工具注册与查询逻辑不动）
-- **MCP 模式启动预检**：默认路径配置缺失时，向 **stderr**（stdout 是 MCP 协议通道，不得污染）打印引导信息并 `exit(1)`：
-  - 引导文本包含：缺失路径、两条出路（运行 `npx maxtoken init`；或手动创建 `~/.maxtoken/tokens.json`，附最小示例 JSON 片段）、`--config` / `MAXTOKEN_CONFIG` 可指定其他路径
-- 工具调用阶段的 `loadConfig` 保留（热重载），显式路径缺失的错误信息同样补全引导提示
+- **MCP 模式启动预检**：启动时对最终解析出的路径（含显式指定的 `--config` / 环境变量路径）做存在性检查——**无论显式还是默认路径，缺失一律启动即引导后 `exit(1)`**（统一 fail fast）；引导信息打印到 **stderr**（stdout 是 MCP 协议通道，不得污染），内容包含：
+  - 缺失路径、两条出路（运行 `npx maxtoken init`；或手动创建 `~/.maxtoken/tokens.json`，附最小示例 JSON 片段）、`--config` / `MAXTOKEN_CONFIG` 可指定其他路径
+- 工具调用阶段的 `loadConfig` 保留（热重载），其错误信息同样补全引导提示
 
 ## 四、兼容性与文档
 
@@ -73,6 +74,7 @@ src/
   - 优先级链（`--config` > 环境变量 > 默认路径）
   - 显式指定但缺失 → 报错；默认存在 → 返回路径；默认缺失 → 返回"未找到"语义
 - 配置校验单测：缺 `id` / 缺 `api_key` / `provider` 不合法等逐条报错
+- 通过 `package.json` 新增 `test` 脚本运行（项目已有 devDependency `tsx`：`tsx --test`），不新增任何依赖
 - 向导 readline 交互、MCP 启动引导信息：手动验证
 
 ## 七、非目标（YAGNI）
