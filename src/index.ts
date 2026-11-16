@@ -8,6 +8,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { runWizard } from "./wizard.js";
 
 // ==================== 1. CLI 参数解析与 JSON 配置加载 ====================
 const { values } = parseArgs({
@@ -349,6 +350,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 async function main() {
+  // init 子命令：交互式创建配置向导（必须作为第一个参数出现）
+  if (process.argv[2] === "init") {
+    await runWizard(values.config as string | undefined);
+    return;
+  }
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
