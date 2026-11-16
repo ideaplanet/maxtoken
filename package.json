@@ -2,6 +2,24 @@
   "name": "maxtoken-mcp",
   "version": "1.0.0",
   "description": "Lightweight MCP server for GLM & Kimi Coding Plan balance query and utilization statistics.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "glm",
+    "kimi",
+    "coding-plan",
+    "token-balance",
+    "utilization"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ideaplanet/maxtoken-mcp.git"
+  },
+  "homepage": "https://github.com/ideaplanet/maxtoken-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/ideaplanet/maxtoken-mcp/issues"
+  },
   "type": "module",
   "bin": {
     "maxtoken-mcp": "./dist/index.js"
