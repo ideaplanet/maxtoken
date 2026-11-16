@@ -1,0 +1,21 @@
+{
+  "accounts": [
+    {
+      "id": "glm-main",
+      "provider": "glm",
+      "plan": "max",
+      "api_key": "your_glm_coding_api_key_here",
+      "enabled": true,
+      "notes": "主力智谱 Max 账号"
+    },
+    {
+      "id": "kimi-main",
+      "provider": "kimi",
+      "plan": "pro",
+      "api_key": "sk-kimi-your_coding_token_here",
+      "region": "cn",
+      "enabled": true,
+      "notes": "主力 Kimi Coding 账号 (cn: api.kimi.com | global: api.kimi.ai)"
+    }
+  ]
+}
