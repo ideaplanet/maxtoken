@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-import fs from "node:fs";
-import path from "node:path";
 import { parseArgs } from "node:util";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -8,9 +6,15 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import {
+  buildMissingConfigGuidance,
+  loadConfig,
+  resolveConfigPath,
+  type AccountConfig,
+  type ConfigFile,
+} from "./config.js";
 import { runWizard } from "./wizard.js";
 
-// ==================== 1. CLI 参数解析与 JSON 配置加载 ====================
 const { values } = parseArgs({
   options: {
     config: { type: "string", short: "c" },
@@ -18,37 +22,7 @@ const { values } = parseArgs({
   strict: false,
 });
 
-const configPath = path.resolve(
-  (values.config as string) ||
-    process.env.MAXTOKEN_CONFIG ||
-    "./tokens.json"
-);
-
-interface AccountConfig {
-  id: string;
-  provider: "glm" | "kimi";
-  plan?: string;
-  api_key: string;
-  region?: "cn" | "global";
-  enabled?: boolean;
-  notes?: string;
-}
-
-interface ConfigFile {
-  accounts: AccountConfig[];
-}
-
-function loadConfig(): ConfigFile {
-  if (!fs.existsSync(configPath)) {
-    throw new Error(`找不到 JSON 配置文件: ${configPath}，请通过 --config 参数指定路径`);
-  }
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const parsed = JSON.parse(raw) as ConfigFile;
-  if (!Array.isArray(parsed.accounts)) {
-    throw new Error(`配置文件格式错误: 缺少 accounts 数组 (${configPath})`);
-  }
-  return parsed;
-}
+let configPath = "";
 
 // ==================== 2. 平台余额采集数据结构 ====================
 interface WindowBalance {
@@ -284,7 +258,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const cfg = loadConfig();
+  const cfg = loadConfig(configPath);
   const { name, arguments: args } = request.params;
   const accountId = (args as any)?.account_id as string | undefined;
 
@@ -355,6 +329,14 @@ async function main() {
     await runWizard(values.config as string | undefined);
     return;
   }
+  // 启动预检：解析链结果缺失（显式或默认）一律 fail fast，
+  // 引导信息走 stderr（stdout 是 MCP 协议通道，不得污染）
+  const resolution = resolveConfigPath(values.config as string | undefined);
+  if (resolution.status !== "found") {
+    console.error(buildMissingConfigGuidance(resolution));
+    process.exit(1);
+  }
+  configPath = resolution.path;
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
